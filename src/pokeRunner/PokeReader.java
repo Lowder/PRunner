@@ -12,7 +12,7 @@ public class PokeReader {
 	public String line = "";
 	public String csvSplitBy = ",";
         
-        private String directory = "C:\\Users\\Steven Lowder\\Documents\\PA Stuff\\Pokemafia\\";
+        //private String directory = "C:\\Users\\Steven Lowder\\Documents\\PA Stuff\\Pokemafia\\";
 	
 	public PokeReader(){
 		
