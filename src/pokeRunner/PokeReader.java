@@ -54,7 +54,7 @@ public class PokeReader {
 		return new PokeGame();
 	}
 	
-	public ArrayList<Player> getPlayers(Pokedex dex, PokeGame gameInfo){
+	public ArrayList<Player> getPlayers(PokeGame gameInfo){
             openFile("Current.csv");
 
             try {
@@ -74,7 +74,18 @@ public class PokeReader {
 	
 	public Orders getOrders(PokeGame gameInfo){
             openFile("Orders.csv");
-            return new Orders();
+            Orders orders = new Orders();
+            try {
+                br.readLine();
+                while ((line = br.readLine()) != null) {	 
+                    // use comma as separator
+                    orders.addOrder(line.split(csvSplitBy));
+                }
+            }catch (IOException e) {
+                    e.printStackTrace();
+            }
+            closeReader();
+            return orders;
 	}
 	
 	public Pokedex getPokedex(){

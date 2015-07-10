@@ -36,4 +36,15 @@ public class PDEntry {
     public int spDefense;
     public int speed;
     
+    public PDEntry(){
+    	
+    }
+    
+    public boolean canCapture(){
+    	if(captureType == 'A' || captureType == 'B' || captureType == 'C')
+    		return true;
+    	else
+    		return false;
+    }
+    
 }

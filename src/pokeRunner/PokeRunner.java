@@ -1,7 +1,5 @@
 package pokeRunner;
 
-import java.util.ArrayList;
-
 public class PokeRunner {
 
 	/**
@@ -17,26 +15,26 @@ public class PokeRunner {
 		PokeGame gameInfo = reader.getConfig();
 		
 		//Read Pokedex CSV
-		Pokedex pokedex = reader.getPokedex();		
+		gameInfo.pokedex = reader.getPokedex();		
 		//Read Player CSV
-		ArrayList<Player> players = reader.getPlayers(pokedex, gameInfo);
+		gameInfo.players = reader.getPlayers(gameInfo);
 		//Read Orders
 		Orders orders = reader.getOrders(gameInfo);
 		
 		//Process Pokemon non-Battle Abilities
-		Abilities abilities = new Abilities();
-		for (Player p: players)
+		Abilities abilities = new Abilities(gameInfo.pokedex);
+		for (Player p: gameInfo.players)
 			p.pokeNonCombat(abilities);
 		//Process Orders
-		players = orders.process(players, abilities, gameInfo);
+		gameInfo.players = orders.process(gameInfo, abilities);
 		
 		PokeWriter writer = new PokeWriter();
 		//write Player CSV
-		writer.writePlayers(players, gameInfo);
+		writer.writePlayers(gameInfo);
 		//write PM CSV
-		writer.writePMs(players, gameInfo);
+		writer.writePMs(gameInfo);
 		//write Results CSV
-		writer.writeResults(players, gameInfo);
+		writer.writeResults(gameInfo);
 		
 	}
 
