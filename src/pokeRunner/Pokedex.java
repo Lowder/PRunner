@@ -16,13 +16,13 @@ public class Pokedex {
 	public double[][] typeChart;
 	
 	public Pokedex(){
-		pokedex = new ArrayList<PDEntry>();
+		pokedex = new ArrayList<>();
 		buildLegendaries();
 		buildTypeChart();
 	}
 	
-	public void buildLegendaries(){
-		legendaries = new ArrayList<Integer>(
+	private void buildLegendaries(){
+		legendaries = new ArrayList<>(
 						Arrays.asList(	493, 144, 482, 251, 638, 488, 491, 386, 483, 718,
 								244, 649, 487, 383, 485, 250, 385, 647, 382, 646,
 								645, 380, 381, 249, 490, 648, 481, 151, 150, 146, 
@@ -30,7 +30,7 @@ public class Pokedex {
 								639, 642, 641, 480, 494, 640, 716, 717, 145, 644));
 	}
 	
-	public void buildTypeChart(){
+	private void buildTypeChart(){
 		
 		typeChart = new double[18][18];
 		typeChart[0] = new double[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.5, 0, 1, 1, 0.5, 1};
@@ -96,5 +96,9 @@ public class Pokedex {
 		newEntry.speed = Integer.parseInt(values[PokedexColumns.SPEED.ordinal()]);
 		pokedex.add(newEntry);
 	}
+        
+        public PDEntry getEntry(int pdnum){
+            return pokedex.get(pdnum-1);
+        }
 	
 }

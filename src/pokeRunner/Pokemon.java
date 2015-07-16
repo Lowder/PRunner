@@ -29,10 +29,23 @@ public class Pokemon {
 	public int fTime;
 	public boolean poisoned;
 	public boolean knockedOut;
-	
-	public Pokemon(){
-		guarded = false;
+        
+        public Pokemon(String[] readerData, Pokedex pd){
+		pdEntry = pd.getEntry(Integer.parseInt(readerData[0]));
 	}
+        
+        public Pokemon(PDEntry pd){
+            pdEntry = pd;
+            initializeStatus();
+        }
+        
+        private void initializeStatus(){
+            loadStatus(new String[]{});
+        }
+        
+        private void loadStatus(String[] statusData){
+            
+        }
 	
 	public Object[] getTarget(){
 		if (plTarget == null)

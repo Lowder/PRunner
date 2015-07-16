@@ -3,7 +3,12 @@ package pokeRunner;
 import java.util.ArrayList;
 
 public class Player {
-
+        
+        public enum RH {PNAME, AONE, ATWO, F, ALIGN, ROLE, TYPE,
+                                    LOC, ACT, TAR1, SPACT, TAR2, MV, 
+                                    P1, S1, N1, H1, ST1, A1, T1, 
+                                    P2, S2, N2, H2, ST2, A2, T2,
+                                    P3, S3, N3, H3, ST3, A3, T3};
 	
 	public String faction;
 	public String alignment;
@@ -44,6 +49,49 @@ public class Player {
 		tms = TM;
 		underground = 0;
 	}
+        
+        public Player (String[] playerInfo, Pokedex pd){
+         
+            
+            faction = playerInfo[RH.F.ordinal()];
+            alignment = playerInfo[RH.ALIGN.ordinal()];
+            //rival = ;
+
+            team = new Pokemon[3];
+            addTeam(playerInfo, pd);
+//            public ArrayList<Pokemon> box;
+            captured = new ArrayList<>();
+//
+            paName = playerInfo[RH.PNAME.ordinal()];
+            alias1 = playerInfo[RH.AONE.ordinal()];
+            alias2 = playerInfo[RH.ATWO.ordinal()];;
+//
+//            public int[] items;
+//            public ArrayList<String> tms;
+            location = playerInfo[RH.LOC.ordinal()];
+            avoidChallenge = 0;
+            ability = TrainerAbilities.valueOf(playerInfo[RH.TYPE.ordinal()]);
+            sAbility = SpecialTrainerAbilities.valueOf(playerInfo[RH.SPACT.ordinal()]);
+            underground = 0;
+//
+            results = new ArrayList<>();
+        }
+        
+        private void addTeam(String[] pokemonTeam, Pokedex pd){
+            int pDataSize = 7;
+            int startColumn = 13;
+            for (int i = 0; i < 3; i++){
+                String[] pokemon = new String[7];
+                System.arraycopy(pokemonTeam, i*pDataSize+startColumn, pokemon, 0, pDataSize);
+                addPokemonToTeam(pokemon, i, pd);
+            }
+        }
+        
+        public void addPokemonToTeam(String[] pokeData, int pos, Pokedex pd){
+            Pokemon poke = new Pokemon(pokeData, pd);
+            team[pos] = poke;
+        }
+
 	
 	public void pokeNonCombat(Abilities abilities){
 		for (int i = 0; i < team.length; i++){

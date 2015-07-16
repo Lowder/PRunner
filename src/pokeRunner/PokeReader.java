@@ -61,9 +61,8 @@ public class PokeReader {
                 while ((line = br.readLine()) != null) {
                     // use comma as separator
                     String[] playerInfo = line.split(csvSplitBy);
-
-                    System.out.println("Country [code= " + playerInfo[4] 
-                         + " , name=" + playerInfo[5] + "]");
+                    Player player = new Player(playerInfo, gameInfo.pokedex);
+                    gameInfo.players.add(player);
                 }
             }catch (IOException e) {
                 e.printStackTrace();

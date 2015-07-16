@@ -109,7 +109,7 @@ public class Generator {
 			ArrayList<Pokemon> possible = new ArrayList<Pokemon>();
 			for(PDEntry p:pokedex.pokedex){
 				if(p.canCapture() && (capType.contains(p.type1) || capType.contains(p.type2))){
-					possible.add(new Pokemon()); //TODO: Add logic to create a new pokemon from entry
+					possible.add(new Pokemon(p)); //TODO: Add logic to create a new pokemon from entry
 				}
 					
 			}
