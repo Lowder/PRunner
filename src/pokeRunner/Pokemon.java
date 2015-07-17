@@ -46,6 +46,56 @@ public class Pokemon {
         private void loadStatus(String[] statusData){
             
         }
+        
+        public String printPM(){
+		String d = "";
+		d += "[img]http://www.serebii.net/";
+		if(shiny)
+			d += "SHINY/XY/"; 
+		else
+			d += "xy/pokemon/";
+		d += pdEntry.number + ".png[/img][br]";
+		d += "[b]" + cName + "[/b] - " + pdEntry.name.toUpperCase();
+		d += " ([b]" + tOne.description(tOne.ordinal()) + "/" + tTwo.description(tTwo.ordinal()) + "[/b])[br]";
+		d += "[indent][i]Status[/i] = " + statusPM() + "[br]";
+		d += "[i]Happiness[/i] = " + happinessPM() + "[br]";
+//		[b]Synthesis[/b] - Will find two random items each night.[/indent] //Ability Info
+//		[b]Synthesis[/b] - Will find two random items each night.[/indent] //If Legendary or Ditto
+		d += "-----------------------------[br]";	
+		return d;
+	}
+	
+	public String printBoxPM(){
+		String bpm = "";
+		
+		bpm += "[b]" + cName + "[/b] - " + pdEntry.name.toUpperCase();
+		bpm += " ([b]" + tOne.description(tOne.ordinal()) + "/" + tTwo.description(tTwo.ordinal()) + "[/b]) ";
+		//bpm += ABILITY NAME HERE / SPABILITY NAME HERE
+		return bpm;
+	}
+	
+	public String statusPM(){
+		String s = "";
+		
+		return s;
+	}
+	
+	public String happinessPM(){
+		String[] hString = {"Dead", "Detest", "Scared", "Neutral", "Friendly", "Very Close", "Favorite!"};
+		return hString[happiness];
+	}
+	
+	public void updateHappiness(int num){
+		happiness += num;
+		if(happiness < 1)
+			happiness = 1;
+		else if (happiness > 5)
+			happiness = 5;
+	}
+	
+	public void makeFavorite(){
+		happiness = 6;
+	}
 	
 	public Object[] getTarget(){
 		if (plTarget == null)

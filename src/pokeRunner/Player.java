@@ -104,7 +104,12 @@ public class Player {
 	}
 	
 	public String teamSeer(){
-		return "Put team seer info here";
+		String seerResult = "";
+		seerResult += alias2;
+		seerResult += " has the following team:";
+		for (int i = 0; i < team.length; i++)
+			seerResult += team[i].pdEntry.name + ", ";
+		return seerResult.substring(0, seerResult.length()-2);
 	}
 	
 	public String abilitySeer(String type){
@@ -112,6 +117,59 @@ public class Player {
 			return "One ability chosen at random";
 		else
 			return "Put ability seer info here";
+	}
+	
+	public String printItemsPM(){
+		String itemResult = "";
+		for(int i = 0; i < items.length; i++){
+			if(items[i] > 0)
+				itemResult += ItemType.printPM(i) + "(" + items[i] + "), ";
+		}
+		if(!tms.isEmpty()) {
+			itemResult += "TMs: [";
+			for(int i = 0; i < tms.size(); i++)
+				itemResult += tms.get(i) + ", ";
+			itemResult = itemResult.substring(0, itemResult.length()-2) + "]  ";
+		}
+		
+		return itemResult.substring(0, itemResult.length()-2);
+	}
+	
+	public String getWinconPM(){
+		String pmInfo = "";
+		switch (faction){
+			case "Faction1":
+			case "Faction2":
+			case "Faction3":
+				pmInfo += "Your Trainer Team is the first to complete the following steps, in order, as a group:[indent][br]";
+				pmInfo += "1: Defeat all Gym Leaders[br]";
+				pmInfo += "2: Defeat the Elite Four[br]";
+				pmInfo += "3: Have a Trainer (still alive in thread) defeat the Champion[/indent]";		
+				break;
+			case "Team Rocket":
+				pmInfo += "No Trainer Team is able to complete their wincon.";
+				break;
+			case "Defender of the League":
+				pmInfo += "The only players in the thread are Defenders of the League. This can be accomplished by:[indent][br]";
+				pmInfo += "1: No Trainer Team is able to complete their wincon AND[br]";
+				pmInfo += "2: All members of Team Rocket have been eliminated from the thread[/indent][br]";
+				break;
+			default:
+				break;
+		}
+		return pmInfo;
+	}
+	
+	public String printPokeBox(){
+		String pb = "";
+		for (Pokemon p: box) {
+			pb += p.printBoxPM() + "[br]";
+		}	
+		return pb.substring(0, pb.length());
+	}
+	
+	public String printFactionPM(){
+		return faction;
 	}
 
 	public String getFaction() {
