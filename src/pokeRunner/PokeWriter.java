@@ -38,7 +38,7 @@ public class PokeWriter {
                         writer.print("[br]");
                         writer.print("[indent][i]Location[/i] - " + p.location + "[br]");
                         writer.print("[i]Items[/i] - " + p.printItemsPM() + "[/indent][br]");
-                        writer.print("[b]Faction[/b] - " + p.getFaction() + "[br]");
+                        writer.print("[b]Trainer Team[/b] - " + p.getFaction() + "[br]");
                         writer.print("[b]Wincon[/b] - " + p.getWinconPM() + "[br]");
                         writer.print("[b]Trainer Abilities[/b][indent][br]");
                         writer.print("[b]" + p.ability + "[/b] - " + p.ability.description(p.ability.ordinal()) + "[br]");

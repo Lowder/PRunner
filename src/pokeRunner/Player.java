@@ -5,11 +5,11 @@ import java.util.ArrayList;
 public class Player {
         
         public enum RH {PNAME, AONE, ATWO, F, ALIGN, ROLE, TYPE,
-                                    LOC, ACT, TAR1, SPACT, TAR2, MV, 
-                                    P1, S1, N1, H1, ST1, A1, T1, 
-                                    P2, S2, N2, H2, ST2, A2, T2,
-                                    P3, S3, N3, H3, ST3, A3, T3};
-	
+                            LOC, ACT, TAR1, SPACT, TAR2, MV, 
+                            P1, S1, N1, H1, ST1, A1, T1, 
+                            P2, S2, N2, H2, ST2, A2, T2,
+                            P3, S3, N3, H3, ST3, A3, T3};
+
 	public String faction;
 	public String alignment;
 	public Player rival;
@@ -34,21 +34,6 @@ public class Player {
 	public int underground;
 	
 	public ArrayList<String> results;
-	
-	public Player(String PN, String A1, String A2, Pokemon[] T, ArrayList<Pokemon> B, int[] I, ArrayList<String> TM, String L,
-					TrainerAbilities a, SpecialTrainerAbilities sa){
-		team = T;
-		box = B;
-		paName = PN;
-		alias1 = A1;
-		alias2 = A2;
-		location = L;
-		items = I;
-		ability = a;
-		sAbility = sa;
-		tms = TM;
-		underground = 0;
-	}
         
         public Player (String[] playerInfo, Pokedex pd){
          
@@ -64,7 +49,7 @@ public class Player {
 //
             paName = playerInfo[RH.PNAME.ordinal()];
             alias1 = playerInfo[RH.AONE.ordinal()];
-            alias2 = playerInfo[RH.ATWO.ordinal()];;
+            alias2 = playerInfo[RH.ATWO.ordinal()];
 //
 //            public int[] items;
 //            public ArrayList<String> tms;
@@ -94,78 +79,78 @@ public class Player {
 
 	
 	public void pokeNonCombat(Abilities abilities){
-		for (int i = 0; i < team.length; i++){
-			if (team[i].isActive() && abilities.abilityType(team[i]).equals("NonCombat")){
-				if (team[i].isPlayerTarget)
-					abilities.activateAbility(team[i], team[i].getTarget());
-			}
-				
-		}
+            for (int i = 0; i < team.length; i++){
+                if (team[i].isActive() && abilities.abilityType(team[i]).equals("NonCombat")){
+                    if (team[i].isPlayerTarget)
+                        abilities.activateAbility(team[i], team[i].getTarget());
+                }
+
+            }
 	}
 	
 	public String teamSeer(){
-		String seerResult = "";
-		seerResult += alias2;
-		seerResult += " has the following team:";
-		for (int i = 0; i < team.length; i++)
-			seerResult += team[i].pdEntry.name + ", ";
-		return seerResult.substring(0, seerResult.length()-2);
+            String seerResult = "";
+            seerResult += alias2;
+            seerResult += " has the following team:";
+            for (int i = 0; i < team.length; i++)
+                seerResult += team[i].pdEntry.name + ", ";
+            return seerResult.substring(0, seerResult.length()-2);
 	}
 	
 	public String abilitySeer(String type){
-		if("type".equalsIgnoreCase("rand"))
-			return "One ability chosen at random";
-		else
-			return "Put ability seer info here";
+            if("type".equalsIgnoreCase("rand"))
+                return "One ability chosen at random";
+            else
+                return "Put ability seer info here";
 	}
 	
 	public String printItemsPM(){
-		String itemResult = "";
-		for(int i = 0; i < items.length; i++){
-			if(items[i] > 0)
-				itemResult += ItemType.printPM(i) + "(" + items[i] + "), ";
-		}
-		if(!tms.isEmpty()) {
-			itemResult += "TMs: [";
-			for(int i = 0; i < tms.size(); i++)
-				itemResult += tms.get(i) + ", ";
-			itemResult = itemResult.substring(0, itemResult.length()-2) + "]  ";
-		}
-		
-		return itemResult.substring(0, itemResult.length()-2);
+            String itemResult = "";
+            for(int i = 0; i < items.length; i++){
+                if(items[i] > 0)
+                    itemResult += ItemType.printPM(i) + "(" + items[i] + "), ";
+            }
+            if(!tms.isEmpty()) {
+                itemResult += "TMs: [";
+                for(int i = 0; i < tms.size(); i++)
+                    itemResult += tms.get(i) + ", ";
+                itemResult = itemResult.substring(0, itemResult.length()-2) + "]  ";
+            }
+
+            return itemResult.substring(0, itemResult.length()-2);
 	}
 	
 	public String getWinconPM(){
-		String pmInfo = "";
-		switch (faction){
-			case "Faction1":
-			case "Faction2":
-			case "Faction3":
-				pmInfo += "Your Trainer Team is the first to complete the following steps, in order, as a group:[indent][br]";
-				pmInfo += "1: Defeat all Gym Leaders[br]";
-				pmInfo += "2: Defeat the Elite Four[br]";
-				pmInfo += "3: Have a Trainer (still alive in thread) defeat the Champion[/indent]";		
-				break;
-			case "Team Rocket":
-				pmInfo += "No Trainer Team is able to complete their wincon.";
-				break;
-			case "Defender of the League":
-				pmInfo += "The only players in the thread are Defenders of the League. This can be accomplished by:[indent][br]";
-				pmInfo += "1: No Trainer Team is able to complete their wincon AND[br]";
-				pmInfo += "2: All members of Team Rocket have been eliminated from the thread[/indent][br]";
-				break;
-			default:
-				break;
-		}
-		return pmInfo;
+            String pmInfo = "";
+            switch (faction){
+                case "Faction1":
+                case "Faction2":
+                case "Faction3":
+                    pmInfo += "Your Trainer Team is the first to complete the following steps, in order, as a group:[indent][br]";
+                    pmInfo += "1: Defeat all Gym Leaders[br]";
+                    pmInfo += "2: Defeat the Elite Four[br]";
+                    pmInfo += "3: Have a Trainer (still alive in thread) defeat the Champion[/indent]";		
+                    break;
+                case "Team Rocket":
+                    pmInfo += "No Trainer Team is able to complete their wincon.";
+                    break;
+                case "Defender of the League":
+                    pmInfo += "The only players in the thread are Defenders of the League. This can be accomplished by:[indent][br]";
+                    pmInfo += "1: No Trainer Team is able to complete their wincon AND[br]";
+                    pmInfo += "2: All members of Team Rocket have been eliminated from the thread[/indent][br]";
+                    break;
+                default:
+                    break;
+            }
+            return pmInfo;
 	}
 	
 	public String printPokeBox(){
-		String pb = "";
-		for (Pokemon p: box) {
-			pb += p.printBoxPM() + "[br]";
-		}	
-		return pb.substring(0, pb.length());
+            String pb = "";
+            for (Pokemon p: box) {
+                pb += p.printBoxPM() + "[br]";
+            }	
+            return pb.substring(0, pb.length());
 	}
 	
 	public String printFactionPM(){

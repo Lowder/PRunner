@@ -86,7 +86,7 @@ public class Pokemon {
 	}
 	
 	public void updateHappiness(int num){
-		happiness += num;
+		happiness += num * happyMod;
 		if(happiness < 1)
 			happiness = 1;
 		else if (happiness > 5)

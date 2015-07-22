@@ -55,7 +55,7 @@ public class PokeReader {
 	}
 	
 	public ArrayList<Player> getPlayers(PokeGame gameInfo){
-            openFile("Current.csv");
+            openFile("Day" + gameInfo.day + "/PlayerData.csv");
 
             try {
                 while ((line = br.readLine()) != null) {
@@ -72,7 +72,7 @@ public class PokeReader {
 	}
 	
 	public Orders getOrders(PokeGame gameInfo){
-            openFile("Orders.csv");
+            openFile("Day" + gameInfo.day + "/Orders.csv");
             Orders orders = new Orders();
             try {
                 br.readLine();
