@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package pokeRunner;
 
 /**
@@ -11,6 +10,7 @@ package pokeRunner;
  * @author Steven Lowder
  */
 public class PDEntry {
+
     //basic info
     public int number;
     public String spriteNum;
@@ -35,16 +35,17 @@ public class PDEntry {
     public int spAttack;
     public int spDefense;
     public int speed;
-    
-    public PDEntry(){
-    	
+
+    public PDEntry() {
+
     }
-    
-    public boolean canCapture(){
-    	if(captureType == 'A' || captureType == 'B' || captureType == 'C')
-    		return true;
-    	else
-    		return false;
+
+    public boolean canCapture() {
+        if (captureType == 'A' || captureType == 'B' || captureType == 'C') {
+            return true;
+        } else {
+            return false;
+        }
     }
-    
+
 }
