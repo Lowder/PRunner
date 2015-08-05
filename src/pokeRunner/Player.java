@@ -27,7 +27,7 @@ public class Player {
 
     public int[] items;
     public ArrayList<String> tms;
-    public String location;
+    public Locations location;
 
     public int avoidChallenge;
 
@@ -55,7 +55,7 @@ public class Player {
 //
 //            public int[] items;
 //            public ArrayList<String> tms;
-        location = playerInfo[RH.LOC.ordinal()];
+        location = Locations.valueOf(playerInfo[RH.LOC.ordinal()]);
         avoidChallenge = 0;
         ability = TrainerAbilities.valueOf(playerInfo[RH.TYPE.ordinal()]);
         sAbility = SpecialTrainerAbilities.valueOf(playerInfo[RH.SPACT.ordinal()]);
@@ -75,7 +75,7 @@ public class Player {
     }
 
     public void addPokemonToTeam(String[] pokeData, int pos, Pokedex pd) {
-        Pokemon poke = new Pokemon(pokeData, pd);
+        Pokemon poke = new Pokemon(pokeData, pd, this);
         team[pos] = poke;
     }
 
@@ -259,11 +259,11 @@ public class Player {
         this.tms = tms;
     }
 
-    public String getLocation() {
+    public Locations getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(Locations location) {
         this.location = location;
     }
 

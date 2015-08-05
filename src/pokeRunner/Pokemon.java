@@ -1,13 +1,17 @@
 package pokeRunner;
 
+import java.util.Random;
+
 public class Pokemon {
+    
+    public enum PH {
+        PNUM, SHIN, NAM, HAP, STAT, ABT, TGT
+    };
 
     public PDEntry pdEntry;
     public String cName;
     public Player trainer;
-
-    public Typings tOne;
-    public Typings tTwo;
+    
     public Typings tAbility;
 
     //order information
@@ -29,13 +33,32 @@ public class Pokemon {
     public int fTime;
     public boolean poisoned;
     public boolean knockedOut;
+    
+    //special rules
+    public PDEntry dittoInfo;
 
-    public Pokemon(String[] readerData, Pokedex pd) {
-        pdEntry = pd.getEntry(Integer.parseInt(readerData[0]));
+    public Pokemon(String[] readerData, Pokedex pd, Player p) {
+        pdEntry = pd.getEntry(Integer.parseInt(readerData[PH.PNUM.ordinal()]));
+        if(readerData[PH.SHIN.ordinal()] == "y")
+            shiny = true;
+        else
+            shiny = false;
+        cName = readerData[PH.NAM.ordinal()];
+        happiness = Integer.parseInt(readerData[PH.HAP.ordinal()]);
+        trainer = p;
     }
 
     public Pokemon(PDEntry pd) {
         pdEntry = pd;
+        if(pd.type2 != null){
+             Random r = new Random();
+             int aRoll = r.nextInt(2);
+             if(aRoll == 1)
+                 tAbility = pd.type1;
+             else
+                 tAbility = pd.type2;
+        } else
+            tAbility = pd.type1;
         initializeStatus();
     }
 
@@ -57,11 +80,18 @@ public class Pokemon {
         }
         d += pdEntry.number + ".png[/img][br]";
         d += "[b]" + cName + "[/b] - " + pdEntry.name.toUpperCase();
-        d += " ([b]" + tOne.description(tOne.ordinal()) + "/" + tTwo.description(tTwo.ordinal()) + "[/b])[br]";
+        d += " ([b]" + pdEntry.type1.description(pdEntry.type1.ordinal()) + 
+                "/" + pdEntry.type2.description(pdEntry.type2.ordinal()) + "[/b])[br]";
         d += "[indent][i]Status[/i] = " + statusPM() + "[br]";
         d += "[i]Happiness[/i] = " + happinessPM() + "[br]";
 //		[b]Synthesis[/b] - Will find two random items each night.[/indent] //Ability Info
-//		[b]Synthesis[/b] - Will find two random items each night.[/indent] //If Legendary or Ditto
+        if(pdEntry.captureType == 'L')
+            d += "[b]LEGENDARY[/b]: This pokemon's attack effectiveness is doubled during challenges[br]";
+        if(pdEntry.number == 132)
+            d += "[b]Ditto[/b] - Name a pokemon in the region, Ditto will "
+                + "take that form (along with all abilities) the next day. "
+                + "When changing forms Ditto is immediately ready to fight, "
+                + "loses all status effects, and gains neutral connection level.";
         d += "-----------------------------[br]";
         return d;
     }
@@ -70,7 +100,8 @@ public class Pokemon {
         String bpm = "";
 
         bpm += "[b]" + cName + "[/b] - " + pdEntry.name.toUpperCase();
-        bpm += " ([b]" + tOne.description(tOne.ordinal()) + "/" + tTwo.description(tTwo.ordinal()) + "[/b]) ";
+        bpm += " ([b]" + pdEntry.type1.description(pdEntry.type1.ordinal()) + 
+                "/" + pdEntry.type2.description(pdEntry.type2.ordinal()) + "[/b]) ";
         //bpm += ABILITY NAME HERE / SPABILITY NAME HERE
         return bpm;
     }
@@ -100,10 +131,10 @@ public class Pokemon {
     }
 
     public Object[] getTarget() {
-        if (plTarget == null) {
-            return poTarget;
-        } else {
+        if (isPlayerTarget) {
             return plTarget;
+        } else {
+            return poTarget;
         }
     }
 
@@ -173,22 +204,6 @@ public class Pokemon {
 
     public void setTrainer(Player trainer) {
         this.trainer = trainer;
-    }
-
-    public Typings gettOne() {
-        return tOne;
-    }
-
-    public void settOne(Typings tOne) {
-        this.tOne = tOne;
-    }
-
-    public Typings gettTwo() {
-        return tTwo;
-    }
-
-    public void settTwo(Typings tTwo) {
-        this.tTwo = tTwo;
     }
 
     public Typings gettAbility() {

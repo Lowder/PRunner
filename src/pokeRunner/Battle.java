@@ -60,6 +60,8 @@ public class Battle {
                 result *= gi.pokedex.typeChart[a.pdEntry.type2.ordinal()][d.pdEntry.type2.ordinal()];
             }
         }
+        if (a.pdEntry.captureType == 'L')
+            result *= 2;
         return result;
     }
 
