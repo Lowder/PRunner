@@ -25,7 +25,10 @@ public class PokeRunner {
             p.pokeNonCombat(abilities);
         }
         //Process Orders
-        gameInfo.players = orders.process(gameInfo, abilities);
+        orders.process(gameInfo, abilities);
+        
+        //Cleanup
+        gameInfo.cleanUp();
 
         PokeWriter writer = new PokeWriter();
         //write Player CSV

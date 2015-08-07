@@ -21,6 +21,7 @@ public class PDEntry {
 
     //ability info
     public int pLevel;
+    public Typings legendAbility;
 
     //evolution info
     public int evolTo;

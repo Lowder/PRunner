@@ -60,7 +60,7 @@ public class PokeReader {
             while ((line = br.readLine()) != null) {
                 // use comma as separator
                 String[] playerInfo = line.split(csvSplitBy);
-                Player player = new Player(playerInfo, gameInfo.pokedex);
+                Player player = new Player(playerInfo, gameInfo);
                 gameInfo.players.add(player);
             }
         } catch (IOException e) {

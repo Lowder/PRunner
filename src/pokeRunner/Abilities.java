@@ -12,8 +12,9 @@ public class Abilities {
     Random rand;
     Pokedex pokedex;
 
-    Map<String, Map<String, String>> poAbilityInfo;
+    Map<Typings, String[]> poAbilityInfo;
     ArrayList<Typings> combatTypes;
+    ArrayList<Typings> conditionalCombatTypes;
 
     public Abilities(Pokedex p) {
         rand = new Random();
@@ -21,13 +22,62 @@ public class Abilities {
         initializeTypes();
         pokedex = p;
     }
+    
+    public Abilities(){
+    	rand = new Random();
+        createAbilityInfo();
+        initializeTypes();
+    }
 
     public String abilityType(Pokemon mon) {
         if (combatTypes.contains(mon.tAbility)) {
             return "Combat";
+        } else if (conditionalCombatTypes.contains(mon.tAbility)){
+        	return "ConditionalCombat";
         } else {
             return "NonCombat";
         }
+    }
+    
+    public String targetType(Typings type){
+    	return "Pokemon";
+    }
+    
+    public boolean checkCondition(Pokemon mon, Pokemon[] team, Pokemon[] oppTeam){
+    	boolean result = false;
+    	
+    	switch (mon.tAbility) {
+	        case FIRE:
+	            break;
+	        case ELECTRIC:
+	            break;
+	        case ICE:
+	            break;
+	        case FIGHTING:
+	            break;
+	        case POISON:
+	            break;
+	        case BUG:
+	            break;
+	        case ROCK:
+	            break;
+	        case DRAGON:
+	            break;
+	        case DARK:
+	            break;
+	        case STEEL:
+	            break;
+	        case NORMAL:
+	            break;
+	        default:
+	            break;
+	
+	    }
+    	return result;
+    }
+    
+    public void activateAbility(Pokemon mon, Pokemon[] team, Pokemon[] oppTeam){
+    	
     }
 
     public void activateAbility(Pokemon mon, Pokemon target) {
@@ -116,8 +166,10 @@ public class Abilities {
     }
 
     private void initializeTypes() {
-        Typings[] cTypes = {Typings.FIRE, Typings.ELECTRIC, Typings.ICE, Typings.POISON, Typings.DRAGON, Typings.DARK, Typings.STEEL};
+        Typings[] cTypes = {Typings.FIRE, Typings.ELECTRIC, Typings.ICE, Typings.POISON, Typings.DRAGON, Typings.DARK};
         combatTypes = new ArrayList<Typings>(Arrays.asList(cTypes));
+        Typings[] condTypes = {Typings.STEEL, Typings.ROCK};
+        conditionalCombatTypes = new ArrayList<Typings>(Arrays.asList(condTypes));
     }
 
     private void fire(Pokemon mon, Pokemon target) {
@@ -175,6 +227,19 @@ public class Abilities {
     }
 
     private void fighting(Pokemon mon, Pokemon target) {
+    	switch (mon.pdEntry.pLevel) {
+        case 1:
+            target.evolve(pokedex, null);
+            break;
+        case 2:
+        	target.evolve(pokedex, null);
+        case 3:
+            while(target.pdEntry.canEvolve)
+            	target.evolve(pokedex, null);
+            break;
+        default:
+            break;
+    }
     }
 
     private void poison(Pokemon mon, Pokemon target) {
@@ -252,13 +317,13 @@ public class Abilities {
     private void ground(Pokemon mon, Player target) {
         switch (mon.pdEntry.pLevel) {
             case 1:
-                target.setAvoidChallenge(target.avoidChallenge + 1);
+                target.setUnderground(target.underground + 1);
                 break;
             case 2:
-                target.setAvoidChallenge(target.avoidChallenge + 3);
+            	target.setUnderground(target.underground + + 3);
                 break;
             case 3:
-                target.setAvoidChallenge(target.avoidChallenge + 99);
+            	target.setUnderground(target.underground + + 99);
                 break;
             default:
                 break;

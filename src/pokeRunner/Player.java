@@ -1,20 +1,24 @@
 package pokeRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Player {
 
     public enum RH {
 
         PNAME, AONE, ATWO, F, ALIGN, ROLE, TYPE,
-        LOC, ACT, TAR1, SPACT, TAR2, MV,
-        P1, S1, N1, H1, ST1, A1, T1,
-        P2, S2, N2, H2, ST2, A2, T2,
-        P3, S3, N3, H3, ST3, A3, T3
+        LOC, RIV, ACT, TAR1, SPACT, TAR2, MV,
+        P1, S1, N1, H1, ST1, A1, T1, //Pokemon 1
+        P2, S2, N2, H2, ST2, A2, T2, //Pokemon 2
+        P3, S3, N3, H3, ST3, A3, T3, //Pokemon 3
+        RE, LE, ER, LU, PB, FH, CA, TM, // Inventory
+        CAP, BOX
     };
 
     public String faction;
     public String alignment;
+    public String role;
     public Player rival;
 
     public Pokemon[] team;
@@ -29,7 +33,9 @@ public class Player {
     public ArrayList<String> tms;
     public Locations location;
 
+    //item flags
     public int avoidChallenge;
+    public String lure;
 
     public TrainerAbilities ability;
     public SpecialTrainerAbilities sAbility;
@@ -38,23 +44,27 @@ public class Player {
 
     public ArrayList<String> results;
 
-    public Player(String[] playerInfo, Pokedex pd) {
+    public Player(String[] playerInfo, PokeGame gameInfo) {
 
         faction = playerInfo[RH.F.ordinal()];
         alignment = playerInfo[RH.ALIGN.ordinal()];
-        //rival = ;
+        role = playerInfo[RH.ROLE.ordinal()];
+        rival = gameInfo.getPlayer(playerInfo[RH.RIV.ordinal()]);
 
         team = new Pokemon[3];
-        addTeam(playerInfo, pd);
-//            public ArrayList<Pokemon> box;
-        captured = new ArrayList<>();
+        addTeam(playerInfo, gameInfo);
+     	addBox(playerInfo[RH.BOX.ordinal()], gameInfo);
+        addCapd(playerInfo[RH.CAP.ordinal()], gameInfo);
 //
         paName = playerInfo[RH.PNAME.ordinal()];
         alias1 = playerInfo[RH.AONE.ordinal()];
         alias2 = playerInfo[RH.ATWO.ordinal()];
 //
-//            public int[] items;
-//            public ArrayList<String> tms;
+        int itemNum = 7;
+        items = new int[itemNum];
+        for(int i = 0; i < itemNum; i++)
+        	items[i] = Integer.parseInt(playerInfo[RH.RE.ordinal()+i]);
+        tms = new ArrayList<String>(Arrays.asList(playerInfo[RH.TM.ordinal()].split("|")));
         location = Locations.valueOf(playerInfo[RH.LOC.ordinal()]);
         avoidChallenge = 0;
         ability = TrainerAbilities.valueOf(playerInfo[RH.TYPE.ordinal()]);
@@ -63,19 +73,39 @@ public class Player {
 //
         results = new ArrayList<>();
     }
+    
+    private void addBox(String boxInfo, PokeGame gi){
+    	box = new ArrayList<Pokemon>();
+    	String[] boxArray = boxInfo.split("|");
+    	for(int i = 0; i < boxArray.length; i++) {
+    		String[] boxArrayPart = boxArray[i].split(":");
+    		Pokemon mon = new Pokemon(gi, Integer.parseInt(boxArrayPart[0]), boxArrayPart[1], Typings.valueOf(boxArrayPart[2]));
+    		box.add(mon);
+    	}
+    }
+    
+    private void addCapd(String capInfo, PokeGame gi){
+    	captured = new ArrayList<Pokemon>();
+    	String[] capArray = capInfo.split("|");
+    	for(int i = 0; i < capArray.length; i++) {
+    		String[] capArrayPart = capArray[i].split(":");
+    		Pokemon mon = new Pokemon(gi, Integer.parseInt(capArrayPart[0]), capArrayPart[1], Typings.valueOf(capArrayPart[2]));
+    		captured.add(mon);
+    	}
+    }
 
-    private void addTeam(String[] pokemonTeam, Pokedex pd) {
+    private void addTeam(String[] pokemonTeam, PokeGame gameInfo) {
         int pDataSize = 7;
         int startColumn = 13;
         for (int i = 0; i < 3; i++) {
             String[] pokemon = new String[7];
             System.arraycopy(pokemonTeam, i * pDataSize + startColumn, pokemon, 0, pDataSize);
-            addPokemonToTeam(pokemon, i, pd);
+            addPokemonToTeam(pokemon, i, gameInfo);
         }
     }
 
-    public void addPokemonToTeam(String[] pokeData, int pos, Pokedex pd) {
-        Pokemon poke = new Pokemon(pokeData, pd, this);
+    public void addPokemonToTeam(String[] pokeData, int pos, PokeGame gameInfo) {
+        Pokemon poke = new Pokemon(pokeData, gameInfo, this);
         team[pos] = poke;
     }
 
@@ -132,7 +162,7 @@ public class Player {
             case "Faction1":
             case "Faction2":
             case "Faction3":
-                pmInfo += "Your Trainer Team is the first to complete the following steps, in order, as a group:[indent][br]";
+                pmInfo += faction + " is the first team to complete the following steps in order and as a group:[indent][br]";
                 pmInfo += "1: Defeat all Gym Leaders[br]";
                 pmInfo += "2: Defeat the Elite Four[br]";
                 pmInfo += "3: Have a Trainer (still alive in thread) defeat the Champion[/indent]";
@@ -145,6 +175,8 @@ public class Player {
                 pmInfo += "1: No Trainer Team is able to complete their wincon AND[br]";
                 pmInfo += "2: All members of Team Rocket have been eliminated from the thread[/indent][br]";
                 break;
+            case "Pokemon League Champion":
+            	pmInfo += "Only one trainer battles you for the Championship and loses";
             default:
                 break;
         }
@@ -305,5 +337,9 @@ public class Player {
 
     public void setResults(ArrayList<String> results) {
         this.results = results;
+    }
+    
+    public void setLure(String l){
+    	this.lure = l;
     }
 }

@@ -16,7 +16,7 @@ public enum TrainerAbilities {
                 d += "You can explore adjacent areas during your turn. Gain a random item while exploring.";
                 break;
             case 2:
-                d += "When capturing, you are given the choice of two pokemon and can keep one. Captured pokemon start at Friendly Happiness. You have a chance of capturing evolved pokemon.";
+                d += "The capture action gives the choice of two pokemon and you can keep one. Captured pokemon start at Friendly Happiness. You have a chance of capturing evolved pokemon.";
                 break;
             default:
                 break;

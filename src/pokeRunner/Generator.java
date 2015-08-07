@@ -104,14 +104,12 @@ public class Generator {
                         canCap = false;
                         break;			
             }
-            //capture one pokemon of type a || b || c
-            //if collector then capture two pokemon with 50% chance they are evolved if A || B
 
             if(canCap){
                 ArrayList<Pokemon> possible = new ArrayList<>();
                 for(PDEntry p:pokedex.pokedex){
                     if(p.canCapture() && (capType.contains(p.type1) || capType.contains(p.type2))){
-                        possible.add(new Pokemon(p)); //TODO: Add logic to create a new pokemon from entry
+                        possible.add(new Pokemon(p));
                     }
 
                 }
@@ -120,9 +118,12 @@ public class Generator {
                 int cRoll = r.nextInt(2);
                 Pokemon poke = possible.get(roll);
                 if(player.ability == TrainerAbilities.COLLECTOR && cRoll == 2 && poke.pdEntry.canEvolve){
-                    //assign pokemon to be the evolved version
+                    poke.evolve(pokedex, null);
                 }
+                poke.setTrainer(player);
                 player.captured.add(poke);
+                if(player.ability == TrainerAbilities.COLLECTOR)
+                	poke.setHappiness(4);
                 if(player.ability == TrainerAbilities.COLLECTOR && player.captured.size() == 1)
                     getPokemon(player);
 

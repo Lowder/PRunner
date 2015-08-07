@@ -7,46 +7,85 @@ public class Battle {
     }
 
     public void challenge(Player attacker, Player defender, Abilities abilities, PokeGame gi) {
-        double[] aValues = new double[3];
-        double[] dValues = new double[3];
-
-        for (int i = 0; i < 3; i++) {
-            aValues[i] = pBattle(attacker.team[i], defender.team[i], gi);
-            dValues[i] = pBattle(defender.team[i], attacker.team[i], gi);
-        }
-
-        int winner = 0;
-        int[] bolds = {1, 1, 1};
-        for (int i = 0; i < 3; i++) {
-            if (aValues[i] > dValues[i]) {
-                winner += 1;
-            } else if (dValues[i] > aValues[i]) {
-                winner -= 1;
-                bolds[i] = 0;
-            } else {
-                if (attacker.team[i].happiness > defender.team[i].happiness) {
-                    winner += 1;
-                } else if (attacker.team[i].happiness < defender.team[i].happiness) {
-                    winner -= 1;
-                    bolds[i] = 0;
-                } else {
-                    bolds[i] = 2;
-                }
-            }
-        }
-
-        String[] values = convertAStoString(aValues, dValues);
-
-        String win = "tie";
-        if (winner < 0) {
-            win = "defender";
-        } else if (winner > 0) {
-            win = "attacker";
-        }
-
-        String result = printBResult(attacker, defender, values, win, bolds);
-        attacker.results.add(result);
-        defender.results.add(result);
+    	
+    	if(defender.underground > 0){
+    		attacker.results.add(defender.alias1 + " used DIG!");
+    		defender.results.add("DIG helped you escape a challenge!");
+    		defender.setUnderground(defender.underground-1);
+    	} else if (defender.avoidChallenge > 0){
+    		attacker.results.add(defender.alias1 + " escaped!");
+    		defender.results.add("You used an escape rope to avoid a challenge!");
+    		defender.setAvoidChallenge(defender.avoidChallenge-1);
+    		defender.getItems()[ItemType.ESCAPEROPE.ordinal()] -= 1;
+    	} else {
+		    double[] aValues = new double[3];
+		    double[] dValues = new double[3];
+		
+		    for (int i = 0; i < 3; i++) {
+		        aValues[i] = pBattle(attacker.team[i], defender.team[i], gi);
+		        dValues[i] = pBattle(defender.team[i], attacker.team[i], gi);
+		    }
+		    
+		    boolean checkAbilities = true;
+		    boolean[] aAbility = {true, true, true};
+		    boolean[] dAbility = {true, true, true};
+		    
+		    while (checkAbilities){
+		    	checkAbilities = false;
+		    	for(int i = 0; i < 3; i++){
+		    		if(abilities.abilityType(attacker.team[i]) == "ConditionalCombat" 
+		    				&& attacker.team[i].isActive() && aAbility[i])
+		    			if(abilities.checkCondition(attacker.team[i], attacker.team, defender.team)) {
+		    				abilities.activateAbility(attacker.team[i], attacker.team, defender.team);
+		    				checkAbilities = true;
+		    				aAbility[i] = false;
+		    			}
+		    		if(abilities.abilityType(defender.team[i]) == "ConditionalCombat" 
+		    				&& defender.team[i].isActive() && dAbility[i])
+		    			if(abilities.checkCondition(defender.team[i], defender.team, attacker.team)) {
+		    				abilities.activateAbility(defender.team[i], defender.team, attacker.team);
+		    				checkAbilities = true;
+		    				dAbility[i] = false;
+		    			}
+		    	}
+		    }
+		    
+		    int winner = 0;
+		    int[] bolds = {1, 1, 1};
+		    for (int i = 0; i < 3; i++) {
+		        if (aValues[i] > dValues[i]) {
+		            winner += 1;
+		        } else if (dValues[i] > aValues[i]) {
+		            winner -= 1;
+		            bolds[i] = 0;
+		        } else {
+		            if (attacker.team[i].happiness > defender.team[i].happiness) {
+		                winner += 1;
+		            } else if (attacker.team[i].happiness < defender.team[i].happiness) {
+		                winner -= 1;
+		                bolds[i] = 0;
+		            } else {
+		                bolds[i] = 2;
+		            }
+		        }
+		    }
+		
+		    String[] values = convertAStoString(aValues, dValues);
+		
+		    String win = "tie";
+		    if (winner < 0) {
+		        win = "defender";
+		        if(attacker.getAbility() != TrainerAbilities.FIGHTER)
+		        	for(int i = 0; i < 3; i++)
+		        		attacker.getTeam()[i].updateHappiness(-1);
+		    } else if (winner > 0) {
+		        win = "attacker";
+		    }
+		
+		    String result = printBResult(attacker, defender, values, win, bolds);
+		    attacker.results.add(result);
+		    defender.results.add(result);
+    	}
     }
 
     public double pBattle(Pokemon a, Pokemon d, PokeGame gi) {

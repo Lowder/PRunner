@@ -99,6 +99,9 @@ public class Pokedex {
         newEntry.spAttack = Integer.parseInt(values[PokedexColumns.SPATK.ordinal()]);
         newEntry.spDefense = Integer.parseInt(values[PokedexColumns.SPDEF.ordinal()]);
         newEntry.speed = Integer.parseInt(values[PokedexColumns.SPEED.ordinal()]);
+        
+        
+        //TODO: ADD Legendary ability typing info
         pokedex.add(newEntry);
     }
 

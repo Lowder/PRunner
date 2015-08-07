@@ -30,6 +30,11 @@ public class PokeWriter {
                 for (String s : p.results) {
                     writer.print(s + newline);
                 }
+                if(!p.captured.isEmpty()){
+                	for(int i = 0; i < p.captured.size(); i++){
+                		p.captured.get(i).printCapPM();
+                	}
+                }
                 writer.print("[/indent]" + newline);
                 writer.print("[size=4][b][u]CURRENT STATUS[/b][/u][/size]" + newline);
                 writer.print("[b]Trainer Name[/b] - " + p.alias2);

@@ -15,8 +15,8 @@ public class Pokemon {
     public Typings tAbility;
 
     //order information
-    public Pokemon[] poTarget;
-    public Player[] plTarget;
+    public String[] poTarget;
+    public String[] plTarget;
 
     public boolean isPlayerTarget;
 
@@ -37,40 +37,74 @@ public class Pokemon {
     //special rules
     public PDEntry dittoInfo;
 
-    public Pokemon(String[] readerData, Pokedex pd, Player p) {
-        pdEntry = pd.getEntry(Integer.parseInt(readerData[PH.PNUM.ordinal()]));
+    public Pokemon(String[] readerData, PokeGame gameInfo, Player p) {
+        pdEntry = gameInfo.pokedex.getEntry(Integer.parseInt(readerData[PH.PNUM.ordinal()]));
         if(readerData[PH.SHIN.ordinal()] == "y")
             shiny = true;
         else
             shiny = false;
         cName = readerData[PH.NAM.ordinal()];
         happiness = Integer.parseInt(readerData[PH.HAP.ordinal()]);
+        loadStatus(readerData[PH.STAT.ordinal()]);
+        tAbility = Typings.valueOf(readerData[PH.ABT.ordinal()]);
+        Abilities abilities = new Abilities(gameInfo.pokedex);
+        if(abilities.targetType(tAbility) == "Pokemon")
+        	poTarget = new String[]{readerData[PH.TGT.ordinal()]};
+        else
+        	plTarget = new String[]{readerData[PH.TGT.ordinal()]};
         trainer = p;
     }
 
     public Pokemon(PDEntry pd) {
         pdEntry = pd;
-        if(pd.type2 != null){
-             Random r = new Random();
-             int aRoll = r.nextInt(2);
-             if(aRoll == 1)
-                 tAbility = pd.type1;
-             else
-                 tAbility = pd.type2;
-        } else
-            tAbility = pd.type1;
+        if(pd.captureType == 'L')
+        	setAbilityType(pd.legendAbility);
+        setAbilityType(null);
+        happiness = 3;
+        shiny = false;
+        cName = "NAMELESS";
         initializeStatus();
+    }
+    
+    public Pokemon(PokeGame gameInfo, int entryNum, String name, Typings abilityType){
+    	this(gameInfo.pokedex.getEntry(entryNum));
+    	cName = name;
+    	setAbilityType(abilityType);
+    }
+
+	private void setAbilityType(Typings choice){
+    	if(choice != null && ((choice == pdEntry.type1) || (choice == pdEntry.type2)) ) {
+    		tAbility = choice;
+    	} else if(pdEntry.type2 != null){
+            Random r = new Random();
+            int aRoll = r.nextInt(2);
+            if(aRoll == 1)
+                tAbility = pdEntry.type1;
+            else
+                tAbility = pdEntry.type2;
+       } else
+           tAbility = pdEntry.type1;
     }
 
     private void initializeStatus() {
-        loadStatus(new String[]{});
+        loadStatus("R");
     }
 
-    private void loadStatus(String[] statusData) {
+    private void loadStatus(String statusData) {
 
     }
+    
+    public void evolve(Pokedex dex, Typings choice){
+    	if(pdEntry.canEvolve){
+    		pdEntry = dex.getEntry(pdEntry.evolTo);
+    		clearStatus();
+    		setAbilityType(choice);
+    	}
+    }
 
-    public String printPM() {
+    public String printPM(boolean capture) {
+    	
+    	Abilities abilities = new Abilities();
         String d = "";
         d += "[img]http://www.serebii.net/";
         if (shiny) {
@@ -79,21 +113,31 @@ public class Pokemon {
             d += "xy/pokemon/";
         }
         d += pdEntry.number + ".png[/img][br]";
-        d += "[b]" + cName + "[/b] - " + pdEntry.name.toUpperCase();
+        if(!capture)
+        	d += "[b]" + cName + "[/b] - " + pdEntry.name.toUpperCase();
         d += " ([b]" + pdEntry.type1.description(pdEntry.type1.ordinal()) + 
                 "/" + pdEntry.type2.description(pdEntry.type2.ordinal()) + "[/b])[br]";
-        d += "[indent][i]Status[/i] = " + statusPM() + "[br]";
-        d += "[i]Happiness[/i] = " + happinessPM() + "[br]";
-//		[b]Synthesis[/b] - Will find two random items each night.[/indent] //Ability Info
+        if(!capture){
+        	d += "[indent][i]Status[/i] = " + statusPM() + "[br]";
+        	d += "[i]Happiness[/i] = " + happinessPM() + "[br]";
+        }
+        d += abilities.poAbilityInfo.get(tAbility)[pdEntry.pLevel] + "[br]";
         if(pdEntry.captureType == 'L')
             d += "[b]LEGENDARY[/b]: This pokemon's attack effectiveness is doubled during challenges[br]";
         if(pdEntry.number == 132)
-            d += "[b]Ditto[/b] - Name a pokemon in the region, Ditto will "
-                + "take that form (along with all abilities) the next day. "
-                + "When changing forms Ditto is immediately ready to fight, "
-                + "loses all status effects, and gains neutral connection level.";
-        d += "-----------------------------[br]";
+            d += "[b]Ditto[/b] - Name a pokemon in the region. Ditto will "
+                + "take that form (along with all abilities) the next day.[br]";
+        if(!capture)
+        	d += "-----------------------------[br]";
         return d;
+    }
+    
+    public String printPM(){
+    	return printPM(false);
+    }
+    
+    public String printCapPM(){
+    	return printPM(true);
     }
 
     public String printBoxPM() {
@@ -108,8 +152,28 @@ public class Pokemon {
 
     public String statusPM() {
         String s = "";
-
-        return s;
+        if(paralyzed){
+        	s += "Paralyzed ";
+        	if(paralyzedActive)
+        		s += "(Unable to Fight), ";
+        	else
+        		s += "(Able to Fight), ";
+        }
+        if(burned){
+        	
+        }
+        if(frozen){
+        	s += "Frozen (" + fTime + "), ";
+        }
+        if(poisoned){
+        	s += "Poisoned, ";
+        }
+        if(knockedOut){
+        	s += "Knocked Out, ";
+        }
+        if(s == "")
+        	s += "Ready!  ";
+        return s.substring(0, s.length()-2);
     }
 
     public String happinessPM() {
@@ -154,13 +218,19 @@ public class Pokemon {
         fTime = 0;
         poisoned = false;
     }
+    
+    public void knockOut(){
+    	if(happiness != 6) {
+    		knockedOut = true;
+    		clearStatus();
+    	}
+    }
 
     public void freeze(int time) {
         if (!guarded) {
             frozen = true;
             fTime = time;
         }
-
     }
 
     public void burn() {
@@ -214,19 +284,19 @@ public class Pokemon {
         this.tAbility = tAbility;
     }
 
-    public Pokemon[] getPoTarget() {
+    public String[] getPoTarget() {
         return poTarget;
     }
 
-    public void setPoTarget(Pokemon[] poTarget) {
+    public void setPoTarget(String[] poTarget) {
         this.poTarget = poTarget;
     }
 
-    public Player[] getPlTarget() {
+    public String[] getPlTarget() {
         return plTarget;
     }
 
-    public void setPlTarget(Player[] plTarget) {
+    public void setPlTarget(String[] plTarget) {
         this.plTarget = plTarget;
     }
 

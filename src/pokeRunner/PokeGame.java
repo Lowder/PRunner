@@ -20,4 +20,10 @@ public class PokeGame {
         }
         return null;
     }
+    
+    public void cleanUp(){
+    	//switch paralyzes
+    	//reduce frozen times
+    	//clear undergrounds and avoidChallenges
+    }
 }
