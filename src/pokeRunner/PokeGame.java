@@ -5,10 +5,11 @@ import java.util.ArrayList;
 public class PokeGame {
 
     public int day;
-    public ArrayList<Player> players;
+    private ArrayList<Player> players;
     public Pokedex pokedex;
 
     public PokeGame() {
+        players = new ArrayList<Player>();
 
     }
 
@@ -20,10 +21,48 @@ public class PokeGame {
         }
         return null;
     }
-    
-    public void cleanUp(){
-    	//switch paralyzes
-    	//reduce frozen times
-    	//clear undergrounds and avoidChallenges
+
+    public void cleanUp() {
+        for (Player p : players) {
+            for (Pokemon po : p.getTeam()) {
+                if (po.paralyzed) {
+                    po.setParalyzedActive(!po.paralyzedActive);
+                }
+                if (po.frozen) {
+                    po.setfTime(po.fTime - 1);
+                }
+                if (po.fTime == 0) {
+                    po.setFrozen(false);
+                }
+            }
+            for (Pokemon po : p.getBox()) {
+                po.clearStatus();
+                po.setKnockedOut(false);
+            }
+        }
+    }
+
+    public int getDay() {
+        return day;
+    }
+
+    public void setDay(int day) {
+        this.day = day;
+    }
+
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(ArrayList<Player> players) {
+        this.players = players;
+    }
+
+    public Pokedex getPokedex() {
+        return pokedex;
+    }
+
+    public void setPokedex(Pokedex pokedex) {
+        this.pokedex = pokedex;
     }
 }

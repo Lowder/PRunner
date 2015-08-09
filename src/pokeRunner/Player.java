@@ -46,57 +46,93 @@ public class Player {
 
     public Player(String[] playerInfo, PokeGame gameInfo) {
 
+        paName = playerInfo[RH.PNAME.ordinal()];
+        alias1 = playerInfo[RH.AONE.ordinal()];
+        alias2 = playerInfo[RH.ATWO.ordinal()];
+        
         faction = playerInfo[RH.F.ordinal()];
         alignment = playerInfo[RH.ALIGN.ordinal()];
         role = playerInfo[RH.ROLE.ordinal()];
         rival = gameInfo.getPlayer(playerInfo[RH.RIV.ordinal()]);
 
-        team = new Pokemon[3];
-        addTeam(playerInfo, gameInfo);
-     	addBox(playerInfo[RH.BOX.ordinal()], gameInfo);
-        addCapd(playerInfo[RH.CAP.ordinal()], gameInfo);
-//
-        paName = playerInfo[RH.PNAME.ordinal()];
-        alias1 = playerInfo[RH.AONE.ordinal()];
-        alias2 = playerInfo[RH.ATWO.ordinal()];
-//
-        int itemNum = 7;
-        items = new int[itemNum];
-        for(int i = 0; i < itemNum; i++)
-        	items[i] = Integer.parseInt(playerInfo[RH.RE.ordinal()+i]);
-        tms = new ArrayList<String>(Arrays.asList(playerInfo[RH.TM.ordinal()].split("|")));
+        ability = TrainerAbilities.valueOf(playerInfo[RH.TYPE.ordinal()]);
+        if(!playerInfo[RH.SPACT.ordinal()].isEmpty())
+            sAbility = SpecialTrainerAbilities.valueOf(playerInfo[RH.SPACT.ordinal()]);
         location = Locations.valueOf(playerInfo[RH.LOC.ordinal()]);
         avoidChallenge = 0;
-        ability = TrainerAbilities.valueOf(playerInfo[RH.TYPE.ordinal()]);
-        sAbility = SpecialTrainerAbilities.valueOf(playerInfo[RH.SPACT.ordinal()]);
         underground = 0;
-//
+        
+        team = new Pokemon[3];
+        addTeam(playerInfo, gameInfo);
+        
+        int itemNum = 7;
+        items = new int[itemNum];
+        for (int i = 0; i < itemNum; i++) {
+            String amt = playerInfo[RH.RE.ordinal() + i];
+            if ("".equals(amt)) {
+                items[i] = 0;
+            } else {
+                items[i] = Integer.parseInt(amt);
+            }
+        }
+        
+        if(!playerInfo[RH.TM.ordinal()].isEmpty()) {
+            tms = new ArrayList<String>(Arrays.asList(playerInfo[RH.TM.ordinal()].split("\\|")));
+            if(tms.size() < 2 && tms.get(0).length() < 2 && !tms.isEmpty())
+                tms.set(0, "0" + tms.get(0));
+        } else {
+            tms = new ArrayList<String>();
+        }
+        
+        box = new ArrayList<>();
+        if(!playerInfo[RH.BOX.ordinal()].isEmpty())
+            addBox(playerInfo[RH.BOX.ordinal()], gameInfo);
+        
+        captured = new ArrayList<Pokemon>();        
+        if(!playerInfo[RH.CAP.ordinal()].isEmpty())
+            addCapd(playerInfo[RH.CAP.ordinal()], gameInfo);
+        
         results = new ArrayList<>();
     }
-    
-    private void addBox(String boxInfo, PokeGame gi){
-    	box = new ArrayList<Pokemon>();
-    	String[] boxArray = boxInfo.split("|");
-    	for(int i = 0; i < boxArray.length; i++) {
-    		String[] boxArrayPart = boxArray[i].split(":");
-    		Pokemon mon = new Pokemon(gi, Integer.parseInt(boxArrayPart[0]), boxArrayPart[1], Typings.valueOf(boxArrayPart[2]));
-    		box.add(mon);
-    	}
+
+    @Override
+    public boolean equals(Object o) {
+        boolean result = false;
+
+        if (o instanceof String) {
+            String test = (String) o;
+            if (test.equalsIgnoreCase(paName) || test.equalsIgnoreCase(alias1) || test.equalsIgnoreCase(alias2)) {
+                result = true;
+            }
+        } else if (o instanceof Player) {
+            if (this.equals(((Player) o).paName)) {
+                result = true;
+            }
+        }
+        return result;
     }
-    
-    private void addCapd(String capInfo, PokeGame gi){
-    	captured = new ArrayList<Pokemon>();
-    	String[] capArray = capInfo.split("|");
-    	for(int i = 0; i < capArray.length; i++) {
-    		String[] capArrayPart = capArray[i].split(":");
-    		Pokemon mon = new Pokemon(gi, Integer.parseInt(capArrayPart[0]), capArrayPart[1], Typings.valueOf(capArrayPart[2]));
-    		captured.add(mon);
-    	}
+
+    private void addBox(String boxInfo, PokeGame gi) {
+        String[] boxArray = boxInfo.split("\\|");
+        for (int i = 0; i < boxArray.length; i++) {
+            String[] boxArrayPart = boxArray[i].split(":");
+            Pokemon mon = new Pokemon(gi, Integer.parseInt(boxArrayPart[0]), boxArrayPart[1], Typings.valueOf(boxArrayPart[2]));
+            box.add(mon);
+        }
+    }
+
+    private void addCapd(String capInfo, PokeGame gi) {
+        String[] capArray = capInfo.split("\\|");
+        for (int i = 0; i < capArray.length; i++) {
+            String[] capArrayPart = capArray[i].split(":");
+            Pokemon mon = new Pokemon(gi, Integer.parseInt(capArrayPart[0]), capArrayPart[1], Typings.valueOf(capArrayPart[2]));
+            captured.add(mon);
+        }
     }
 
     private void addTeam(String[] pokemonTeam, PokeGame gameInfo) {
         int pDataSize = 7;
-        int startColumn = 13;
+        int startColumn = 14;
         for (int i = 0; i < 3; i++) {
             String[] pokemon = new String[7];
             System.arraycopy(pokemonTeam, i * pDataSize + startColumn, pokemon, 0, pDataSize);
@@ -109,11 +145,17 @@ public class Player {
         team[pos] = poke;
     }
 
-    public void pokeNonCombat(Abilities abilities) {
+    public void pokeNonCombat(PokeGame gi, Abilities abilities) {
         for (int i = 0; i < team.length; i++) {
             if (team[i].isActive() && abilities.abilityType(team[i]).equals("NonCombat")) {
                 if (team[i].isPlayerTarget) {
-                    abilities.activateAbility(team[i], team[i].getTarget());
+
+                    Player[] temp = new Player[team[i].getTarget().length];
+                    for (int j = 0; j < team[i].getTarget().length; j++) {
+                        temp[j] = gi.getPlayer(team[i].getTarget()[j]);
+                    }
+
+                    abilities.activateAbility(team[i], temp);
                 }
             }
 
@@ -142,18 +184,18 @@ public class Player {
         String itemResult = "";
         for (int i = 0; i < items.length; i++) {
             if (items[i] > 0) {
-                itemResult += ItemType.printPM(i) + "(" + items[i] + "), ";
+                itemResult += ItemType.printPM(i) + "(" + items[i] + ") ";
             }
         }
         if (!tms.isEmpty()) {
             itemResult += "TMs: [";
             for (int i = 0; i < tms.size(); i++) {
-                itemResult += tms.get(i) + ", ";
+                itemResult += tms.get(i) + " ";
             }
-            itemResult = itemResult.substring(0, itemResult.length() - 2) + "]  ";
+            itemResult = itemResult.substring(0, itemResult.length() - 1) + "]";
         }
 
-        return itemResult.substring(0, itemResult.length() - 2);
+        return itemResult;
     }
 
     public String getWinconPM() {
@@ -176,7 +218,7 @@ public class Player {
                 pmInfo += "2: All members of Team Rocket have been eliminated from the thread[/indent][br]";
                 break;
             case "Pokemon League Champion":
-            	pmInfo += "Only one trainer battles you for the Championship and loses";
+                pmInfo += "Only one trainer battles you for the Championship and loses";
             default:
                 break;
         }
@@ -188,7 +230,66 @@ public class Player {
         for (Pokemon p : box) {
             pb += p.printBoxPM() + "[br]";
         }
-        return pb.substring(0, pb.length());
+        return pb;
+    }
+
+    public String dataDump() {
+//        public enum RH {
+//
+//            PNAME, AONE, ATWO, F, ALIGN, ROLE, TYPE,
+//            LOC, RIV, ACT, TAR1, SPACT, TAR2, MV,
+//            P1, S1, N1, H1, ST1, A1, T1, //Pokemon 1
+//            P2, S2, N2, H2, ST2, A2, T2, //Pokemon 2
+//            P3, S3, N3, H3, ST3, A3, T3, //Pokemon 3
+//            RE, LE, ER, LU, PB, FH, CA, TM, // Inventory
+//            CAP, BOX
+//        };
+        String dataStream = "";
+        dataStream += this.paName + ",";
+        dataStream += this.alias1 + ",";
+        dataStream += this.alias2 + ",";
+        dataStream += this.faction + ",";
+        dataStream += this.alignment + ",";
+        dataStream += this.role + ",";
+        dataStream += this.ability + ",";
+        dataStream += this.location + ",";
+        if(this.rival != null)
+            dataStream += this.rival.alias2;
+        dataStream += ",";
+        dataStream += ",";
+        dataStream += ",";
+        dataStream += this.sAbility + ",";
+        dataStream += ",";
+        dataStream += ",";
+        for (Pokemon p : this.getTeam()) {
+            dataStream += p.dataDump();
+        }
+        for (int i = 0; i < this.items.length; i++) {
+            dataStream += items[i] + ",";
+        }
+        for (int i = 0; i < tms.size(); i++) {
+            dataStream += tms.get(i);
+                if(i < tms.size()-1)
+                    dataStream += "|";
+                else
+                    dataStream += ",";
+                    
+        }
+        for (int i = 0; i < captured.size(); i++){
+            dataStream += captured.get(i).secDataDump();
+            if(i < captured.size()-1)
+                    dataStream += "|";
+                else
+                    dataStream += ",";
+        }
+        for (int i = 0; i < box.size(); i++){
+            dataStream += box.get(i).secDataDump();
+            if(i < box.size()-1)
+                    dataStream += "|";
+                else
+                    dataStream += ",";
+        }
+        return dataStream;
     }
 
     public String printFactionPM() {
@@ -338,8 +439,8 @@ public class Player {
     public void setResults(ArrayList<String> results) {
         this.results = results;
     }
-    
-    public void setLure(String l){
-    	this.lure = l;
+
+    public void setLure(String l) {
+        this.lure = l;
     }
 }

@@ -49,9 +49,9 @@ public class Pokemon {
         tAbility = Typings.valueOf(readerData[PH.ABT.ordinal()]);
         Abilities abilities = new Abilities(gameInfo.pokedex);
         if(abilities.targetType(tAbility) == "Pokemon")
-        	poTarget = new String[]{readerData[PH.TGT.ordinal()]};
+        	poTarget = readerData[PH.TGT.ordinal()].split("|");
         else
-        	plTarget = new String[]{readerData[PH.TGT.ordinal()]};
+        	plTarget = readerData[PH.TGT.ordinal()].split("|");
         trainer = p;
     }
 
@@ -91,18 +91,70 @@ public class Pokemon {
     }
 
     private void loadStatus(String statusData) {
-
+        char[] stats = statusData.toCharArray();
+        for(int i = 0; i < stats.length; i++){
+            switch(stats[i]){
+                case 'r':
+                    break;
+                case 'f':
+                    this.frozen = true;
+                    this.fTime = Integer.parseInt(stats[i+1]+"");
+                    break;
+                case 'b':
+                    this.burned = true;
+                    break;
+                case 'p':
+                    this.poisoned = true;
+                    break;
+                case 'k':
+                    this.knockedOut = true;
+                    break;
+                case 'z':
+                    this.paralyzed = true;
+                    this.paralyzedActive = (stats[i+1] == 'a');
+                    break;
+                    
+            }
+        }
+    }
+    
+    private String statDataDump(){
+        String dataStream = "";
+        if (paralyzed) {
+            dataStream += "z";
+            if (paralyzedActive) {
+                dataStream += "a";
+            } else {
+                dataStream += "i";
+            }
+        }
+        if (burned) {
+            dataStream += "b";
+        }
+        if (frozen) {
+            dataStream += "f" + this.fTime;
+        }
+        if (poisoned) {
+            dataStream += "p";
+        }
+        if (knockedOut) {
+            dataStream += "k";
+        }
+        if (dataStream == "") {
+            dataStream += "r";
+        }
+        return dataStream; 
     }
     
     public void evolve(Pokedex dex, Typings choice){
-    	if(pdEntry.canEvolve){
-    		pdEntry = dex.getEntry(pdEntry.evolTo);
-    		clearStatus();
-    		setAbilityType(choice);
-    	}
+        if (pdEntry.canEvolve) {
+            pdEntry = dex.getEntry(pdEntry.evolTo);
+            clearStatus();
+            setAbilityType(choice);
+        }
     }
 
-    public String printPM(boolean capture) {
+    public String printPM(boolean capture, PokeGame gi) {
     	
     	Abilities abilities = new Abilities();
         String d = "";
@@ -112,32 +164,37 @@ public class Pokemon {
         } else {
             d += "xy/pokemon/";
         }
-        d += pdEntry.number + ".png[/img][br]";
+        d += pdEntry.spriteNum + ".png[/img][br]";
         if(!capture)
         	d += "[b]" + cName + "[/b] - " + pdEntry.name.toUpperCase();
-        d += " ([b]" + pdEntry.type1.description(pdEntry.type1.ordinal()) + 
-                "/" + pdEntry.type2.description(pdEntry.type2.ordinal()) + "[/b])[br]";
+        d += " ([b]" + pdEntry.type1.description(pdEntry.type1.ordinal());
+        if(pdEntry.type2 != null)
+            d+= "/" + pdEntry.type2.description(pdEntry.type2.ordinal());
+        d += "[/b])[br]";
         if(!capture){
-        	d += "[indent][i]Status[/i] = " + statusPM() + "[br]";
-        	d += "[i]Happiness[/i] = " + happinessPM() + "[br]";
+            if(this.pdEntry.canEvolve)
+                d += "Can evolve to " + gi.pokedex.getEntry(this.pdEntry.evolTo).name;
+            d += "[indent][i]Status[/i] = " + statusPM() + "[br]";
+            d += "[i]Happiness[/i] = " + happinessPM() + "[br]";
         }
-        d += abilities.poAbilityInfo.get(tAbility)[pdEntry.pLevel] + "[br]";
+        if(pdEntry.pLevel > 0)
+            d += abilities.poAbilityInfo.get(tAbility)[pdEntry.pLevel-1] + "[br]";
         if(pdEntry.captureType == 'L')
             d += "[b]LEGENDARY[/b]: This pokemon's attack effectiveness is doubled during challenges[br]";
         if(pdEntry.number == 132)
             d += "[b]Ditto[/b] - Name a pokemon in the region. Ditto will "
                 + "take that form (along with all abilities) the next day.[br]";
         if(!capture)
-        	d += "-----------------------------[br]";
+        	d += "[/indent]";
         return d;
     }
     
-    public String printPM(){
-    	return printPM(false);
+    public String printPM(PokeGame gi){
+    	return printPM(false, gi);
     }
     
-    public String printCapPM(){
-    	return printPM(true);
+    public String printCapPM(PokeGame gi){
+    	return printPM(true, gi);
     }
 
     public String printBoxPM() {
@@ -152,28 +209,53 @@ public class Pokemon {
 
     public String statusPM() {
         String s = "";
-        if(paralyzed){
-        	s += "Paralyzed ";
-        	if(paralyzedActive)
-        		s += "(Unable to Fight), ";
-        	else
-        		s += "(Able to Fight), ";
+        if (paralyzed) {
+            s += "Paralyzed ";
+            if (paralyzedActive) {
+                s += "(Unable to Fight), ";
+            } else {
+                s += "(Able to Fight), ";
+            }
         }
-        if(burned){
-        	
+        if (burned) {
+            s += "Burned";
         }
-        if(frozen){
-        	s += "Frozen (" + fTime + "), ";
+        if (frozen) {
+            s += "Frozen (" + fTime + "), ";
         }
-        if(poisoned){
-        	s += "Poisoned, ";
+        if (poisoned) {
+            s += "Poisoned, ";
         }
-        if(knockedOut){
-        	s += "Knocked Out, ";
+        if (knockedOut) {
+            s += "Knocked Out, ";
         }
-        if(s == "")
-        	s += "Ready!  ";
-        return s.substring(0, s.length()-2);
+        if (s == "") {
+            s += "Ready!  ";
+        }
+        return s.substring(0, s.length() - 2);
+    }
+    
+    public String dataDump(){
+        
+//        public enum PH {
+//            PNUM, SHIN, NAM, HAP, STAT, ABT, TGT
+//        };
+    	String dataStream = "";
+    	dataStream += this.pdEntry.number + ",";
+        if(this.shiny)
+            dataStream += "y,";
+        else
+            dataStream += "n,";
+        dataStream += this.cName + ",";
+        dataStream += this.happiness + ",";
+        dataStream += statDataDump() + ",";
+        dataStream += this.tAbility + ",";
+        dataStream += ",";
+    	return dataStream;
+    }
+    
+    public String secDataDump(){
+        return pdEntry.number + ":" + this.cName + ":" + this.tAbility;
     }
 
     public String happinessPM() {
@@ -194,7 +276,7 @@ public class Pokemon {
         happiness = 6;
     }
 
-    public Object[] getTarget() {
+    public String[] getTarget() {
         if (isPlayerTarget) {
             return plTarget;
         } else {

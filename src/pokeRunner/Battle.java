@@ -26,10 +26,13 @@ public class Battle {
 		        dValues[i] = pBattle(defender.team[i], attacker.team[i], gi);
 		    }
 		    
+		    //TODO: Use normal combat abilities 
+		    
 		    boolean checkAbilities = true;
 		    boolean[] aAbility = {true, true, true};
 		    boolean[] dAbility = {true, true, true};
 		    
+		    //TODO: Assign knockouts
 		    while (checkAbilities){
 		    	checkAbilities = false;
 		    	for(int i = 0; i < 3; i++){
@@ -49,6 +52,8 @@ public class Battle {
 		    			}
 		    	}
 		    }
+		    
+		    //TODO: Apply knockouts
 		    
 		    int winner = 0;
 		    int[] bolds = {1, 1, 1};

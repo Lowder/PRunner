@@ -19,17 +19,18 @@ public enum Locations {
     BUZZINGGRASSLAND ("Buzzing Grassland"),
     CRUMBLINGMOUNTAIN ("Crumbling Mountain"),
     ABANDONEDRUINS ("Abandoned Ruins"),
-    MISTYSWAMP ("Misty Swamp");
+    MISTYSWAMP ("Misty Swamp"),
+    TOWEROFCHAMPIONS ("Tower of Champions");
     
-    private final String name;
+    private final String pmName;
     
     Locations(String n){
-        name = n;
+        pmName = n;
     }
     
     @Override
     public String toString(){
-        return name;
+        return pmName;
     }
     
     public String explore(){

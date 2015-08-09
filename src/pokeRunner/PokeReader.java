@@ -44,34 +44,34 @@ public class PokeReader {
 
                 // use comma as separator
                 String[] gameInfo = line.split(csvSplitBy);
-                game.day = Integer.parseInt(gameInfo[0]);
+                game.setDay(Integer.parseInt(gameInfo[0]));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
         closeReader();
-        return new PokeGame();
+        return game;
     }
 
-    public ArrayList<Player> getPlayers(PokeGame gameInfo) {
-        openFile("Day" + gameInfo.day + "/PlayerData.csv");
-
+    public void getPlayers(PokeGame gameInfo) {
+        openFile("Day" + gameInfo.getDay() + "\\PlayerData.csv");
         try {
+            br.readLine();
+            br.readLine();
             while ((line = br.readLine()) != null) {
                 // use comma as separator
                 String[] playerInfo = line.split(csvSplitBy);
                 Player player = new Player(playerInfo, gameInfo);
-                gameInfo.players.add(player);
+                gameInfo.getPlayers().add(player);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
         closeReader();
-        return new ArrayList<Player>();
     }
 
     public Orders getOrders(PokeGame gameInfo) {
-        openFile("Day" + gameInfo.day + "/Orders.csv");
+        openFile("Day" + gameInfo.day + "\\Orders.csv");
         Orders orders = new Orders();
         try {
             br.readLine();

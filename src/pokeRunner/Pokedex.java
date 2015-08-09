@@ -61,6 +61,11 @@ public class Pokedex {
         PDEntry newEntry = new PDEntry();
         newEntry.number = Integer.parseInt(values[PokedexColumns.RNUM.ordinal()]);
         newEntry.spriteNum = values[PokedexColumns.SNUM.ordinal()];
+        if(newEntry.spriteNum.length() < 3) {
+            newEntry.spriteNum = "0" + newEntry.spriteNum;
+            if(newEntry.spriteNum.length() < 3)
+                newEntry.spriteNum = "0" + newEntry.spriteNum;
+        }
         newEntry.name = values[PokedexColumns.PNAME.ordinal()];
         newEntry.type1 = Typings.valueOf(values[PokedexColumns.TYPEONE.ordinal()]);
         if (!values[PokedexColumns.TYPETWO.ordinal()].isEmpty()) {

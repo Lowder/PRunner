@@ -13,63 +13,79 @@ public class PokeWriter {
     }
 
     public void writePlayers(PokeGame gameInfo) {
-        // TODO Auto-generated method stub
-
+        try {
+            PrintWriter writer = new PrintWriter("Day" + gameInfo.day + "\\PLAYERS" + gameInfo.day + ".csv", "UTF-8");
+            String header = "";
+            for (Player.RH rh : Player.RH.values()) {
+                header += rh.toString() + ", ";
+            }
+            writer.println(header.substring(0, header.length() - 2)); //Header
+            for (Player p : gameInfo.getPlayers()) {
+                writer.println(p.dataDump());
+            }
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void writePMs(PokeGame gameInfo) {
         // TODO Auto-generated method stub
         try {
-            PrintWriter writer = new PrintWriter("STATUSPM" + gameInfo.day + ".csv", "UTF-8");
+            PrintWriter writer = new PrintWriter("Day" + gameInfo.day + "\\STATUSPM" + gameInfo.day + ".csv", "UTF-8");
             writer.println("PA Forum,Private Message" + '\n');
-            for (Player p : gameInfo.players) {
+            for (Player p : gameInfo.getPlayers()) {
                 String newline = "[br]";
-                writer.print(p.paName + ",");
-                writer.print("Day " + gameInfo.day + 1 + "Status PM for [b]" + p.paName + "[/b]" + newline);
-                writer.print("[size=4][b][u]NIGHT" + gameInfo.day + "RESULTS[/b][/u][/size][indent]" + newline);
+                String statusPM = "";
+                statusPM += p.paName + ",";
+                statusPM += "Day " + (gameInfo.day + 1) + " Status PM for [b]" + p.paName + "[/b]" + newline;
+                statusPM += "[size=4][b][u]NIGHT " + gameInfo.day + " RESULTS[/b][/u][/size][indent]" + newline;
                 for (String s : p.results) {
-                    writer.print(s + newline);
+                    statusPM += s + newline;
                 }
-                if(!p.captured.isEmpty()){
-                	for(int i = 0; i < p.captured.size(); i++){
-                		p.captured.get(i).printCapPM();
-                	}
+                if (!p.captured.isEmpty()) {
+                    statusPM += "DECIDE WHAT TO DO WITH THE FOLLOWING POKEMON:" + newline;
+                    for (int i = 0; i < p.captured.size(); i++) {
+                        statusPM += p.captured.get(i).printCapPM(gameInfo);
+                    }
                 }
-                writer.print("[/indent]" + newline);
-                writer.print("[size=4][b][u]CURRENT STATUS[/b][/u][/size]" + newline);
-                writer.print("[b]Trainer Name[/b] - " + p.alias2);
+                statusPM += "[/indent]" + newline;
+                statusPM += "[size=4][b][u]CURRENT STATUS[/b][/u][/size]" + newline;
+                statusPM += "[b]Trainer Name[/b] - " + p.alias2;
                 if (p.alias2 != p.alias1) {
-                    writer.print(" (AKA: " + p.alias1 + ")");
+                    statusPM += " (AKA: " + p.alias1 + ")";
                 }
-                writer.print("[br]");
-                writer.print("[indent][i]Location[/i] - " + p.location + "[br]");
-                writer.print("[i]Items[/i] - " + p.printItemsPM() + "[/indent][br]");
-                writer.print("[b]Trainer Team[/b] - " + p.getFaction() + "[br]");
-                writer.print("[b]Wincon[/b] - " + p.getWinconPM() + "[br]");
-                writer.print("[b]Trainer Abilities[/b][indent][br]");
-                writer.print("[b]" + p.ability + "[/b] - " + p.ability.description(p.ability.ordinal()) + "[br]");
-                if (!p.sAbility.equals("")) {
-                    writer.print("[b]" + p.sAbility + "[/b] - " + p.sAbility.description(p.sAbility.ordinal()) + "[br]");
+                statusPM += "[br]";
+                statusPM += "[indent][i]Location[/i] - " + p.location + "[br]";
+                statusPM += "[i]Items[/i] - " + p.printItemsPM() + "[/indent][br]";
+                statusPM += "[b]Trainer Team[/b] - " + p.getFaction() + "[br]";
+                statusPM += "[b]Wincon[/b] - " + p.getWinconPM() + "[br]";
+                statusPM += "[b]Trainer Abilities[/b][indent][br]";
+                statusPM += "[b]" + p.ability + "[/b] - " + p.ability.description(p.ability.ordinal()) + "[br]";
+                if (p.sAbility != null) {
+                    statusPM += "[b]" + p.sAbility + "[/b] - " + p.sAbility.description(p.sAbility.ordinal()) + "[br]";
                 }
-                writer.print("[/indent][br]");
-                writer.print("[b]Pokemon Team[/b][br]-----------------------------[br]-----------------------------[br]");
-                writer.print("*First Position*[br]");
-                writer.print(p.team[0].printPM());
-                writer.print("-----------------------------[br]");
-                writer.print("*Second Position*[br]");
-                writer.print(p.team[1].printPM());
-                writer.print("-----------------------------[br]");
-                writer.print("*Third Position*[br]");
-                writer.print(p.team[2].printPM());
-                writer.print("-----------------------------[br]");
-                writer.print("-----------------------------[br]");
-                writer.print("[b]PokeBox[/b][br]-----------------------------[br]-----------------------------[br]");
-                writer.print(p.printPokeBox());
-                writer.print("-----------------------------[br]");
-                writer.print("-----------------------------[br]");
-                writer.flush();
-                writer.close();
+                statusPM += "[/indent][br]";
+                statusPM += "[b]CURRENT TEAM[/b][br]----------------------------- -----------------------------[br]";
+                statusPM += "*First Position*[br]";
+                statusPM += p.team[0].printPM(gameInfo);
+                statusPM += "-----------------------------[br]";
+                statusPM += "*Second Position*[br]";
+                statusPM += p.team[1].printPM(gameInfo);
+                statusPM += "-----------------------------[br]";
+                statusPM += "*Third Position*[br]";
+                statusPM += p.team[2].printPM(gameInfo);
+                statusPM += "----------------------------- ";
+                statusPM += "-----------------------------[br]";
+                statusPM += "[b]POKEBOX[/b][br]-----------------------------[br]";
+                statusPM += p.printPokeBox();
+                statusPM += "----------------------------- ";
+                statusPM += "-----------------------------[br]";
+                writer.println(statusPM);
             }
+            writer.flush();
+            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -79,9 +95,9 @@ public class PokeWriter {
     public void writeResults(PokeGame gameInfo) {
         // TODO Auto-generated method stub
         try {
-            PrintWriter writer = new PrintWriter("Results" + gameInfo.day + ".txt", "UTF-8");
+            PrintWriter writer = new PrintWriter("Day" + gameInfo.day + "\\RESULTS" + gameInfo.day + ".txt", "UTF-8");
             writer.println("Results" + '\n');
-            for (Player p : gameInfo.players) {
+            for (Player p : gameInfo.getPlayers()) {
                 writer.println(p.paName + "Results:");
                 for (String s : p.results) {
                     writer.println(s);

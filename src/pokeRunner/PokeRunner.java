@@ -13,16 +13,16 @@ public class PokeRunner {
         PokeGame gameInfo = reader.getConfig();
 
         //Read Pokedex CSV
-        gameInfo.pokedex = reader.getPokedex();
+        gameInfo.setPokedex(reader.getPokedex());
         //Read Player CSV
-        gameInfo.players = reader.getPlayers(gameInfo);
+        reader.getPlayers(gameInfo);
         //Read Orders
         Orders orders = reader.getOrders(gameInfo);
 
         //Process Pokemon non-Battle Abilities
-        Abilities abilities = new Abilities(gameInfo.pokedex);
-        for (Player p : gameInfo.players) {
-            p.pokeNonCombat(abilities);
+        Abilities abilities = new Abilities(gameInfo.getPokedex());
+        for (Player p : gameInfo.getPlayers()) {
+            p.pokeNonCombat(gameInfo, abilities);
         }
         //Process Orders
         orders.process(gameInfo, abilities);

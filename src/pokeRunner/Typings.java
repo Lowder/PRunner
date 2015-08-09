@@ -31,4 +31,9 @@ public enum Typings {
         d += "[color=" + colors[i] + "]" + type + "[/color]";
         return d;
     }
+    
+    @Override
+    public String toString(){
+        return name().toString().substring(0, 1).toUpperCase() + name().toString().substring(1).toLowerCase();
+    }
 }
