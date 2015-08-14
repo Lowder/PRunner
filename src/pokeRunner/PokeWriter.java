@@ -41,7 +41,7 @@ public class PokeWriter {
                 statusPM += p.paName + ",";
                 statusPM += "Day " + (gameInfo.day + 1) + " Status PM for [b]" + p.paName + "[/b]" + newline;
                 statusPM += "[size=4][b][u]NIGHT " + gameInfo.day + " RESULTS[/b][/u][/size][indent]" + newline;
-                for (String s : p.results) {
+                for (String s : p.getResults()) {
                     statusPM += s + newline;
                 }
                 if (!p.captured.isEmpty()) {
@@ -99,7 +99,7 @@ public class PokeWriter {
             writer.println("Results" + '\n');
             for (Player p : gameInfo.getPlayers()) {
                 writer.println(p.paName + "Results:");
-                for (String s : p.results) {
+                for (String s : p.getResults()) {
                     writer.println(s);
                 }
             }

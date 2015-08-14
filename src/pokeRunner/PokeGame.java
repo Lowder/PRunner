@@ -1,15 +1,19 @@
 package pokeRunner;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class PokeGame {
 
     public int day;
     private ArrayList<Player> players;
+    private Map<String, ArrayList<Player>> factionBadges;
     public Pokedex pokedex;
 
     public PokeGame() {
         players = new ArrayList<Player>();
+        factionBadges = new TreeMap<String, ArrayList<Player>>();
 
     }
 

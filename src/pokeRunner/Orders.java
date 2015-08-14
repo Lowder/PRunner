@@ -150,6 +150,8 @@ public class Orders {
                     break;
             }
         }
+        
+        //TODO: Player abilities and moves
     }
 
     public void addOrder(String[] order) {

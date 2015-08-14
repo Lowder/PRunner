@@ -105,6 +105,8 @@ public class Generator {
                         break;			
             }
 
+        
+        	//TODO: Lure logic
             if(canCap){
                 ArrayList<Pokemon> possible = new ArrayList<>();
                 for(PDEntry p:pokedex.pokedex){

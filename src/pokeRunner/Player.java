@@ -34,15 +34,19 @@ public class Player {
     public Locations location;
 
     //item flags
-    public int avoidChallenge;
     public String lure;
 
     public TrainerAbilities ability;
     public SpecialTrainerAbilities sAbility;
 
+    //battle flags
     public int underground;
-
-    public ArrayList<String> results;
+    public int avoidChallenge;
+    public double teamMod;
+    public ArrayList<Typings> immune;
+    public ArrayList<Typings> vulnerable;
+    
+    private ArrayList<String> results;
 
     public Player(String[] playerInfo, PokeGame gameInfo) {
 

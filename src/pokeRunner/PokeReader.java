@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class PokeReader {
 
@@ -12,7 +11,9 @@ public class PokeReader {
     public String line = "";
     public String csvSplitBy = ",";
 
-        //private String directory = "C:\\Users\\Steven Lowder\\Documents\\PA Stuff\\Pokemafia\\";
+    //private String directory = "C:\\Users\\Steven Lowder\\Documents\\PA Stuff\\Pokemafia\\";
+    //private String directory = "C:\\Users\\Steven Lowder\\Documents\\PA Stuff\\Pokemafia\\";
+    
     public PokeReader() {
 
     }

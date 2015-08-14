@@ -2,65 +2,68 @@ package pokeRunner;
 
 public class Battle {
 
-    public Battle() {
+	private BattleData bd;
 
+	public Battle() {
+		
     }
 
-    public void challenge(Player attacker, Player defender, Abilities abilities, PokeGame gi) {
-    	
+    public boolean challenge(Player attacker, Player defender, Abilities abilities, PokeGame gi) {
+    	bd = new BattleData(attacker, defender);
     	if(defender.underground > 0){
-    		attacker.results.add(defender.alias1 + " used DIG!");
-    		defender.results.add("DIG helped you escape a challenge!");
+    		attacker.getResults().add(defender.alias1 + " used DIG!");
+    		defender.getResults().add("DIG helped you escape a challenge!");
     		defender.setUnderground(defender.underground-1);
+    		return false;
     	} else if (defender.avoidChallenge > 0){
-    		attacker.results.add(defender.alias1 + " escaped!");
-    		defender.results.add("You used an escape rope to avoid a challenge!");
+    		attacker.getResults().add(defender.alias1 + " escaped!");
+    		defender.getResults().add("You used an escape rope to avoid a challenge!");
     		defender.setAvoidChallenge(defender.avoidChallenge-1);
     		defender.getItems()[ItemType.ESCAPEROPE.ordinal()] -= 1;
+    		return false;
     	} else {
-		    double[] aValues = new double[3];
-		    double[] dValues = new double[3];
-		
 		    for (int i = 0; i < 3; i++) {
-		        aValues[i] = pBattle(attacker.team[i], defender.team[i], gi);
-		        dValues[i] = pBattle(defender.team[i], attacker.team[i], gi);
+		        bd.getaValues()[i] = pBattle(attacker.team[i], defender.team[i], gi);
+		        bd.getdValues()[i] = pBattle(defender.team[i], attacker.team[i], gi);
 		    }
 		    
-		    //TODO: Use normal combat abilities 
+		    //TODO: Use normal combat abilities
+		    for(int i = 0; i < 3; i++) {
+		    	bd = abilities.useCombatAbility(i, bd, gi);
+		    	bd = abilities.useCombatAbility(i+3, bd, gi);
+		    }
 		    
-		    boolean checkAbilities = true;
-		    boolean[] aAbility = {true, true, true};
-		    boolean[] dAbility = {true, true, true};
+		    //TODO: Modify based on player mods
+		    //if champion and in the tower *.5
+		    //if mod set, then multiply all
+		    //if gym leader, 
+		    	//check vulnerable, set to 16
+	    		//check immune, set to 0
 		    
 		    //TODO: Assign knockouts
-		    while (checkAbilities){
-		    	checkAbilities = false;
-		    	for(int i = 0; i < 3; i++){
-		    		if(abilities.abilityType(attacker.team[i]) == "ConditionalCombat" 
-		    				&& attacker.team[i].isActive() && aAbility[i])
-		    			if(abilities.checkCondition(attacker.team[i], attacker.team, defender.team)) {
-		    				abilities.activateAbility(attacker.team[i], attacker.team, defender.team);
-		    				checkAbilities = true;
-		    				aAbility[i] = false;
-		    			}
-		    		if(abilities.abilityType(defender.team[i]) == "ConditionalCombat" 
-		    				&& defender.team[i].isActive() && dAbility[i])
-		    			if(abilities.checkCondition(defender.team[i], defender.team, attacker.team)) {
-		    				abilities.activateAbility(defender.team[i], defender.team, attacker.team);
-		    				checkAbilities = true;
-		    				dAbility[i] = false;
-		    			}
-		    	}
+		    for(int i = 0; i < 3; i++) {
+		    	if(bd.getaValues()[i] > 1.99)
+		    		bd.getaKO()[i] = true;
+		    	if(bd.getdValues()[i] > 1.99)
+		    		bd.getdKO()[i] = true;
 		    }
 		    
+		    //TODO: Check conditional abilities
+		    
 		    //TODO: Apply knockouts
+		    for(int i = 0; i < 3; i++) {
+		    	if(bd.getaKO()[i])
+		    		attacker.getTeam()[i].knockOut();
+		    	if(bd.getdKO()[i])
+		    		defender.getTeam()[i].knockOut();
+		    }
 		    
 		    int winner = 0;
 		    int[] bolds = {1, 1, 1};
 		    for (int i = 0; i < 3; i++) {
-		        if (aValues[i] > dValues[i]) {
+		        if (bd.getaValues()[i] > bd.getdValues()[i]) {
 		            winner += 1;
-		        } else if (dValues[i] > aValues[i]) {
+		        } else if (bd.getdValues()[i] > bd.getaValues()[i]) {
 		            winner -= 1;
 		            bolds[i] = 0;
 		        } else {
@@ -75,21 +78,25 @@ public class Battle {
 		        }
 		    }
 		
-		    String[] values = convertAStoString(aValues, dValues);
+		    String[] values = convertAStoString(bd.getaValues(), bd.getdValues());
 		
 		    String win = "tie";
+		    boolean winCheck = false;;
 		    if (winner < 0) {
 		        win = "defender";
+		        winCheck = false;
 		        if(attacker.getAbility() != TrainerAbilities.FIGHTER)
 		        	for(int i = 0; i < 3; i++)
 		        		attacker.getTeam()[i].updateHappiness(-1);
 		    } else if (winner > 0) {
 		        win = "attacker";
+		        winCheck = true;
 		    }
 		
 		    String result = printBResult(attacker, defender, values, win, bolds);
-		    attacker.results.add(result);
-		    defender.results.add(result);
+		    attacker.getResults().add(result);
+		    defender.getResults().add(result);
+		    return winCheck;
     	}
     }
 
@@ -186,5 +193,13 @@ public class Battle {
 
         return result;
     }
+    
+    public BattleData getBd() {
+		return bd;
+	}
+
+	public void setBd(BattleData bd) {
+		this.bd = bd;
+	}
 
 }

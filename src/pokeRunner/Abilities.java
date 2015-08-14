@@ -39,6 +39,36 @@ public class Abilities {
         }
     }
     
+    public BattleData useCombatAbility(int pos, BattleData bd, PokeGame gi){
+    	Pokemon typeTest;
+    	if(pos < 3)
+    		typeTest = bd.getAttacker().getTeam()[pos];
+    	else
+    		typeTest = bd.getDefender().getTeam()[pos-3];
+    	
+    	if(abilityType(typeTest) == "Combat")
+    		switch (typeTest.tAbility){
+    			case FIRE:
+    				break;
+    			case ELECTRIC:
+    				break;
+    			case ICE:
+    				break;
+    			case POISON: 
+    				break;
+    			case DRAGON: 
+    				break;
+    			case DARK:
+    				break;
+				default:
+					break;
+    					
+    				
+    		}
+    	
+    	return bd;
+    }
+    
     public String targetType(Typings type){
     	return "Pokemon";
     }
@@ -47,37 +77,15 @@ public class Abilities {
     	boolean result = false;
     	
     	switch (mon.tAbility) {
-	        case FIRE:
-	            break;
-	        case ELECTRIC:
-	            break;
-	        case ICE:
-	            break;
-	        case FIGHTING:
-	            break;
-	        case POISON:
-	            break;
-	        case BUG:
-	            break;
 	        case ROCK:
 	            break;
-	        case DRAGON:
-	            break;
-	        case DARK:
-	            break;
 	        case STEEL:
-	            break;
-	        case NORMAL:
 	            break;
 	        default:
 	            break;
 	
 	    }
     	return result;
-    }
-    
-    public void activateAbility(Pokemon mon, Pokemon[] team, Pokemon[] oppTeam){
-    	
     }
 
     public void activateAbility(Pokemon mon, Pokemon target) {
@@ -408,10 +416,10 @@ public class Abilities {
     private void psychic(Pokemon mon, Player target) {
         switch (mon.pdEntry.pLevel) {
             case 1:
-                mon.trainer.results.add(target.abilitySeer("rand"));
+                mon.getTrainer().getResults().add(target.abilitySeer("rand"));
             case 2:
             case 3:
-                mon.trainer.results.add(target.abilitySeer("all"));
+                mon.getTrainer().getResults().add(target.abilitySeer("all"));
             default:
                 break;
         }
@@ -419,7 +427,7 @@ public class Abilities {
     }
 
     private void fairy(Pokemon mon, Player target) {
-        mon.trainer.results.add(target.teamSeer());
+        mon.getTrainer().getResults().add(target.teamSeer());
     }
 
     private void grass(Pokemon mon, Player target) {
